@@ -1,0 +1,13 @@
+GET http://localhost:5000/api/cars
+
+###
+
+POST http://localhost:5000/api/cars HTTP/1.1
+content-type: application/json
+
+{
+    "VIN": 898565,
+    "make": "Honda",
+    "model": "Accord",
+    "mileage": 56666
+}
