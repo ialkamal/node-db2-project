@@ -11,3 +11,8 @@ content-type: application/json
     "model": "Accord",
     "mileage": 56666
 }
+
+###
+GET http://localhost:5000/api/cars/5
+
+###

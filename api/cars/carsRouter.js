@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { getCars, insertCar } = require("./carsModel");
+const { getCars, insertCar, getCarByID } = require("./carsModel");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -14,24 +14,50 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/:id", checkId, (req, res, next) => {
+  const car = req.car;
+  res.status(200).json(car);
+});
+
 router.post("/", checkPayload, async (req, res, next) => {
   const newCar = req.car;
   try {
     const id = await insertCar(newCar);
-    res
-      .status(200)
-      .json({
-        id,
-        ...newCar,
-        transmissionType: newCar.transmissionType || null,
-        titleStatus: newCar.titleStatus || null,
-      });
+    res.status(200).json({
+      id,
+      ...newCar,
+      transmissionType: newCar.transmissionType || null,
+      titleStatus: newCar.titleStatus || null,
+    });
   } catch (err) {
     err.message = "can't post a car to the server.";
     err.statusCode = 500;
     next(err);
   }
 });
+
+async function checkId(req, res, next) {
+  const { id } = req.params;
+  try{
+    const car = await getCarByID(id);
+    if (!car) {
+      err = new Error();
+      err.message = "Car not found";
+      err.statusCode = 404;
+      next(err);
+    } else {
+      req.car = car;
+      next();
+    }
+  }
+  catch(err) {
+    err.message = "Server error.";
+    err.statusCode = 500;
+    next(err);
+  }
+  
+
+}
 
 function checkPayload(req, res, next) {
   const body = req.body;
