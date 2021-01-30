@@ -15,4 +15,14 @@ async function insertCar(car) {
   return id;
 }
 
-module.exports = { getCars, insertCar, getCarByID };
+async function updateCar(id, car) {
+  const count = await db("cars").where({ id }).update(car);
+  return count;
+}
+
+async function removeCar(id) {
+  const count = await db("cars").where({ id }).del();
+  return count;
+}
+
+module.exports = { getCars, insertCar, getCarByID, updateCar, removeCar };

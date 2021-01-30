@@ -6,13 +6,28 @@ POST http://localhost:5000/api/cars HTTP/1.1
 content-type: application/json
 
 {
-    "VIN": 898565,
+    "VIN": 123564,
     "make": "Honda",
     "model": "Accord",
-    "mileage": 56666
+    "mileage": 87855
 }
 
 ###
+
 GET http://localhost:5000/api/cars/5
 
 ###
+
+PUT http://localhost:5000/api/cars/1 HTTP/1.1
+content-type: application/json
+
+{
+    "VIN": 365581,
+    "make": "bmw",
+    "model": "x3",
+    "mileage": 45000
+}
+
+###
+
+DELETE http://localhost:5000/api/cars/4

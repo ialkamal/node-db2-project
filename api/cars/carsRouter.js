@@ -1,7 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const { getCars, insertCar, getCarByID } = require("./carsModel");
+const {
+  getCars,
+  insertCar,
+  getCarByID,
+  updateCar,
+  removeCar,
+} = require("./carsModel");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -23,7 +29,7 @@ router.post("/", checkPayload, async (req, res, next) => {
   const newCar = req.car;
   try {
     const id = await insertCar(newCar);
-    res.status(200).json({
+    res.status(201).json({
       id,
       ...newCar,
       transmissionType: newCar.transmissionType || null,
@@ -36,9 +42,55 @@ router.post("/", checkPayload, async (req, res, next) => {
   }
 });
 
+router.put("/:id", checkId, checkPayload, async (req, res, next) => {
+  const { id } = req.params;
+  const changes = req.car;
+
+  try {
+    const count = await updateCar(id, changes);
+    if (count === 1) {
+      res.status(200).json({
+        id,
+        ...changes,
+        transmissionType: changes.transmissionType || null,
+        titleStatus: changes.titleStatus || null,
+      });
+    } else {
+      err = new Error();
+      err.message = "Server failed to update record.";
+      err.statusCode = 500;
+      next(err);
+    }
+  } catch (err) {
+    err.message = "can't update the car in the server.";
+    err.statusCode = 500;
+    next(err);
+  }
+});
+
+router.delete("/:id", checkId, async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const count = await removeCar(id);
+    if (count === 1) {
+      res.sendStatus(204);
+    } else {
+      err = new Error();
+      err.message = "Server failed to delete record.";
+      err.statusCode = 500;
+      next(err);
+    }
+  } catch (err) {
+    err.message = "can't delete the car in the server.";
+    err.statusCode = 500;
+    next(err);
+  }
+});
+
 async function checkId(req, res, next) {
   const { id } = req.params;
-  try{
+  try {
     const car = await getCarByID(id);
     if (!car) {
       err = new Error();
@@ -49,14 +101,11 @@ async function checkId(req, res, next) {
       req.car = car;
       next();
     }
-  }
-  catch(err) {
+  } catch (err) {
     err.message = "Server error.";
     err.statusCode = 500;
     next(err);
   }
-  
-
 }
 
 function checkPayload(req, res, next) {
